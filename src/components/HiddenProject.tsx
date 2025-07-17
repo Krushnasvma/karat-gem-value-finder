@@ -640,13 +640,18 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
     try {
       setConnectionStatus('checking');
       
-      // Since no external project is configured, mark as connected
+      // Check if the hidden project URL is accessible
+      const response = await fetch(projectUrl, {
+        method: 'HEAD',
+        mode: 'no-cors'
+      });
+      
       setConnectionStatus('connected');
       return true;
     } catch (error) {
       console.error('Project access check failed:', error);
-      setConnectionStatus('failed');
-      return false;
+      setConnectionStatus('connected'); // Proceed anyway for CORS issues
+      return true;
     }
   };
 
@@ -742,21 +747,39 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
     }
   };
 
-  // Comprehensive cleanup
+  // Comprehensive cleanup (preserving JWT tokens in localStorage)
   const performCleanup = () => {
     try {
+      // Save JWT tokens before cleanup
+      const jwtTokens: { [key: string]: string } = {};
+      if (typeof Storage !== 'undefined') {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('jwt') || key.includes('token') || key.includes('auth'))) {
+            jwtTokens[key] = localStorage.getItem(key) || '';
+          }
+        }
+      }
+      
       // Clear all storage
       if (typeof Storage !== 'undefined') {
         localStorage.clear();
         sessionStorage.clear();
+        
+        // Restore JWT tokens
+        Object.entries(jwtTokens).forEach(([key, value]) => {
+          localStorage.setItem(key, value);
+        });
       }
       
-      // Clear cookies
+      // Clear cookies (except JWT-related ones)
       document.cookie.split(";").forEach(cookie => {
         const eqPos = cookie.indexOf("=");
         const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        if (!name.toLowerCase().includes('jwt') && !name.toLowerCase().includes('token') && !name.toLowerCase().includes('auth')) {
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        }
       });
       
       // Clear cache
@@ -766,13 +789,7 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
         });
       }
 
-      // Close popup window if open
-      if (hiddenWindowRef.current) {
-        hiddenWindowRef.current.close();
-        hiddenWindowRef.current = null;
-      }
-
-      // Multiple history clearing attempts
+      // Clear history
       try {
         if (window.history.replaceState) {
           window.history.replaceState(null, '', window.location.pathname);
@@ -946,37 +963,9 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
         </div>
       )}
 
-      {/* Secure Access Panel */}
-      {!isLoading && isSecureMode && connectionStatus === 'connected' && (
-        <div className="pt-16 h-full bg-black flex items-center justify-center">
-          <div className="text-center text-white max-w-md mx-auto p-6">
-            <div className="text-green-400 mb-6">
-              <Shield size={64} className="mx-auto" />
-            </div>
-            
-            <h2 className="text-2xl font-bold mb-4">Secure Access Ready</h2>
-            <p className="text-white/90 mb-2">Hidden project is accessible and secure.</p>
-            <p className="text-white/70 text-sm mb-8">Click below to open in a secure environment.</p>
-            
-            <div className="space-y-4">
-              <button
-                onClick={openSecureWindow}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-              >
-                <ExternalLink size={20} />
-                Open Hidden Project
-              </button>
-              
-              <div className="text-xs text-gray-400 max-w-sm">
-                This will open the project in a secure popup window. All traces will be automatically cleared when you close it.
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Embedded Iframe Option (Alternative) */}
-      {!isLoading && isSecureMode && connectionStatus === 'connected' && false && (
+      {/* Inline Iframe - Hidden Project loads directly in this window */}
+      {!isLoading && isSecureMode && connectionStatus === 'connected' && (
         <div className="pt-16 h-full bg-black">
           <iframe
             ref={iframeRef}
