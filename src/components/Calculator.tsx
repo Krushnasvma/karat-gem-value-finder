@@ -12,7 +12,7 @@ export const Calculator = () => {
     handleNumberClick,
     handleOperatorClick,
     handleEqualsClick,
-    handleClearClick,
+    handleBackspaceClick,
     handleAllClearClick,
     handleDecimalClick,
     handleGoldConversion,
@@ -72,9 +72,9 @@ export const Calculator = () => {
           </button>
           <button
             className="calc-button"
-            onClick={() => handleButtonClick(handleClearClick)}
+            onClick={() => handleButtonClick(handleBackspaceClick)}
           >
-            C
+            ⌫
           </button>
           <button
             className="calc-button"

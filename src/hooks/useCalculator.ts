@@ -200,13 +200,21 @@ export const useCalculator = () => {
     });
   }, [checkTriggerSequence]);
 
-  const handleClearClick = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      display: '0',
-      expression: '',
-      triggerSequence: ''
-    }));
+  const handleBackspaceClick = useCallback(() => {
+    setState(prev => {
+      if (prev.isError) return prev;
+      
+      const newDisplay = prev.display.length > 1 ? prev.display.slice(0, -1) : '0';
+      const newExpression = prev.expression.length > 0 ? prev.expression.slice(0, -1) : '';
+      const newTriggerSequence = prev.triggerSequence.length > 0 ? prev.triggerSequence.slice(0, -1) : '';
+      
+      return {
+        ...prev,
+        display: newDisplay,
+        expression: newExpression,
+        triggerSequence: newTriggerSequence
+      };
+    });
   }, []);
 
   const handleAllClearClick = useCallback(() => {
@@ -286,7 +294,7 @@ export const useCalculator = () => {
     handleNumberClick,
     handleOperatorClick,
     handleEqualsClick,
-    handleClearClick,
+    handleBackspaceClick,
     handleAllClearClick,
     handleDecimalClick,
     handleGoldConversion,
