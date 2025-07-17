@@ -1,0 +1,286 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Premium Calculator Design System with Gold Accents */
+
+@layer base {
+  :root {
+    --background: 220 8% 12%;
+    --foreground: 48 100% 95%;
+
+    --card: 220 10% 15%;
+    --card-foreground: 48 100% 95%;
+
+    --popover: 220 10% 15%;
+    --popover-foreground: 48 100% 95%;
+
+    --primary: 45 100% 60%;
+    --primary-foreground: 220 8% 12%;
+
+    --secondary: 220 8% 18%;
+    --secondary-foreground: 48 100% 95%;
+
+    --muted: 220 8% 18%;
+    --muted-foreground: 48 20% 70%;
+
+    --accent: 45 100% 60%;
+    --accent-foreground: 220 8% 12%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 48 100% 95%;
+
+    --border: 220 8% 25%;
+    --input: 220 8% 18%;
+    --ring: 45 100% 60%;
+
+    --radius: 0.75rem;
+
+    /* Calculator-specific design tokens */
+    --calc-button-bg: 220 8% 22%;
+    --calc-button-hover: 220 8% 28%;
+    --calc-button-active: 220 8% 32%;
+    --calc-operator-bg: 220 8% 18%;
+    --calc-operator-hover: 220 8% 24%;
+    --calc-gold-bg: 45 100% 60%;
+    --calc-gold-hover: 45 100% 65%;
+    --calc-gold-active: 45 100% 55%;
+    --calc-display-bg: 220 12% 8%;
+    --calc-display-border: 220 8% 30%;
+    
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(45 100% 60%), hsl(45 100% 70%));
+    --gradient-button: linear-gradient(135deg, hsl(var(--calc-button-bg)), hsl(220 8% 25%));
+    --gradient-display: linear-gradient(180deg, hsl(var(--calc-display-bg)), hsl(220 10% 10%));
+    
+    /* Shadows */
+    --shadow-button: 0 2px 8px hsl(220 8% 8% / 0.4);
+    --shadow-gold: 0 4px 16px hsl(45 100% 60% / 0.3);
+    --shadow-display: inset 0 2px 8px hsl(220 8% 5% / 0.6);
+    
+    /* Animations */
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-gold: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* Fix for removing bottom grey line */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  #root {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  .calc-button {
+    @apply relative flex items-center justify-center h-16 text-lg font-semibold rounded-lg transition-all duration-200 active:scale-95;
+    background: var(--gradient-button);
+    color: hsl(var(--foreground));
+    box-shadow: var(--shadow-button);
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .calc-button:hover {
+    background: hsl(var(--calc-button-hover));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(220 8% 8% / 0.5);
+  }
+  
+  .calc-button:active {
+    background: hsl(var(--calc-button-active));
+    transform: translateY(0);
+  }
+  
+  .calc-operator {
+    @apply calc-button;
+    background: hsl(var(--calc-operator-bg));
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+  
+  .calc-operator:hover {
+    background: hsl(var(--calc-operator-hover));
+  }
+  
+  .calc-gold {
+    @apply calc-button;
+    background: var(--gradient-gold);
+    color: hsl(var(--primary-foreground));
+    font-weight: 700;
+    box-shadow: var(--shadow-gold);
+  }
+  
+  .calc-gold:hover {
+    background: hsl(var(--calc-gold-hover));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px hsl(45 100% 60% / 0.4);
+  }
+  
+  .calc-gold:active {
+    background: hsl(var(--calc-gold-active));
+    transform: translateY(0);
+  }
+  
+  .calc-display {
+    @apply rounded-lg p-4 mb-4 h-24 flex flex-col justify-end overflow-hidden;
+    background: var(--gradient-display);
+    border: 1px solid hsl(var(--calc-display-border));
+    box-shadow: var(--shadow-display);
+  }
+  
+  .calc-expression {
+    @apply text-sm opacity-60 mb-2 font-mono;
+    color: hsl(var(--muted-foreground));
+  }
+  
+  .calc-result {
+    @apply text-2xl sm:text-3xl font-bold text-right font-mono truncate;
+    color: hsl(var(--foreground));
+    line-height: 1.2;
+  }
+  
+  .calc-container {
+    @apply w-full max-w-sm mx-auto p-4 sm:p-6;
+    width: min(100vw - 2rem, 384px);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: 0 8px 32px hsl(220 8% 8% / 0.3);
+  }
+  
+  .calc-grid {
+    @apply grid grid-cols-4 gap-3;
+  }
+  
+  .calc-grid-5 {
+    @apply grid grid-cols-5 gap-3;
+  }
+  
+  .button-press {
+    animation: buttonPress 0.1s ease-out;
+  }
+  
+  .gold-glow {
+    animation: goldGlow 0.5s ease-out;
+  }
+  
+  .error-flash {
+    animation: errorFlash 0.3s ease-out;
+  }
+  
+  .hidden-portal {
+    @apply fixed inset-0 z-50 bg-background;
+    animation: portalOpen 0.5s ease-out;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .watermark {
+    @apply fixed top-4 right-4 text-xs opacity-50;
+    color: hsl(var(--muted-foreground));
+  }
+  
+  .calc-watermark {
+    @apply mt-4 text-xs opacity-50 text-center;
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+@keyframes buttonPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes goldGlow {
+  0% { box-shadow: var(--shadow-gold); }
+  50% { box-shadow: 0 0 30px hsl(45 100% 60% / 0.6); }
+  100% { box-shadow: var(--shadow-gold); }
+}
+
+@keyframes errorFlash {
+  0% { background: hsl(var(--calc-display-bg)); }
+  50% { background: hsl(var(--destructive) / 0.2); }
+  100% { background: hsl(var(--calc-display-bg)); }
+}
+
+@keyframes portalOpen {
+  0% { 
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
