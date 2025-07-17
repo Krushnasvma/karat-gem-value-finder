@@ -596,8 +596,8 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
     const disableSelection = () => {
       document.body.style.userSelect = 'none';
       document.body.style.webkitUserSelect = 'none';
-      document.body.style.mozUserSelect = 'none';
-      document.body.style.msUserSelect = 'none';
+      (document.body.style as any).mozUserSelect = 'none';
+      (document.body.style as any).msUserSelect = 'none';
     };
 
     // Add event listeners
@@ -613,8 +613,8 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
       
       document.body.style.userSelect = '';
       document.body.style.webkitUserSelect = '';
-      document.body.style.mozUserSelect = '';
-      document.body.style.msUserSelect = '';
+      (document.body.style as any).mozUserSelect = '';
+      (document.body.style as any).msUserSelect = '';
     });
 
     return cleanupFunctions;
