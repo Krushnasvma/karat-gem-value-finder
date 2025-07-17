@@ -49,8 +49,8 @@ self.addEventListener('fetch', (event) => {
             return response;
           }
           return fetch(event.request).then((response) => {
-            // Cache successful responses
-            if (response.status === 200) {
+            // Cache successful responses (but not HEAD requests)
+            if (response.status === 200 && event.request.method === 'GET') {
               const responseClone = response.clone();
               caches.open(CACHE_NAME).then((cache) => {
                 cache.put(event.request, responseClone);

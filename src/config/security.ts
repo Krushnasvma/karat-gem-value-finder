@@ -1,5 +1,5 @@
 // Obfuscated configuration - DO NOT MODIFY
-const _0x1a2b = ['', 'MCswPQ=='];
+const _0x1a2b = ['', ''];
 const _0x3c4d = (str: string) => atob(str);
 const _0x5e6f = () => _0x3c4d(_0x1a2b[0]);
 const _0x7g8h = () => _0x3c4d(_0x1a2b[1]);
