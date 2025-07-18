@@ -978,6 +978,14 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
               height: 'calc(100vh - 4rem)',
               display: 'block'
             }}
+            onLoad={() => {
+              // Additional history cleanup after iframe loads
+              setTimeout(() => {
+                if (window.history.replaceState) {
+                  window.history.replaceState(null, '', window.location.pathname);
+                }
+              }, 100);
+            }}
           />
         </div>
       )}
