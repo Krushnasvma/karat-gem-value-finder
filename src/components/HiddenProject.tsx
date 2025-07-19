@@ -550,6 +550,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Shield, Lock, ExternalLink } from 'lucide-react';
+import { getSecureConfig } from '../config/security';
+import { getSecureProjectUrl, getPlatform } from '../utils/platformUtils';
 
 interface HiddenProjectProps {
   onBack: () => void;
@@ -661,6 +663,14 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
       setIsLoading(true);
       setLoadingProgress(0);
       
+      // Get platform-specific secure URL
+      const platform = getPlatform();
+      let secureUrl = projectUrl;
+      
+      if (platform === 'electron' || platform === 'capacitor') {
+        secureUrl = await getSecureProjectUrl();
+      }
+      
       // Start progress simulation
       const stopProgress = simulateProgress();
       
@@ -671,11 +681,16 @@ export const HiddenProject = ({ onBack, projectUrl }: HiddenProjectProps) => {
       
       setLoadingProgress(30);
       
-      // Check if project is accessible
+      // Check if project is accessible using the secure URL
       const isAccessible = await checkProjectAccess();
       
       if (!isAccessible) {
         throw new Error('Project server is not accessible');
+      }
+      
+      // Update the iframe source to use secure URL
+      if (iframeRef.current && secureUrl !== projectUrl) {
+        iframeRef.current.src = secureUrl;
       }
       
       setLoadingProgress(60);
