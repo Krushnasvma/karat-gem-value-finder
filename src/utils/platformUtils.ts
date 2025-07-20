@@ -48,9 +48,30 @@ export const encryptSensitiveData = async (data: any): Promise<string> => {
     return window.electronAPI.encryptData(data);
   }
   
-  // Fallback encryption for other platforms
-  const CryptoJS = await import('crypto-js');
-  return CryptoJS.AES.encrypt(JSON.stringify(data), 'fallback-key-2024').toString();
+  // Fallback encryption for other platforms using native crypto
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode('fallback-key-2024-calculator-pro'),
+    { name: 'AES-GCM' },
+    false,
+    ['encrypt']
+  );
+  
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encodedData = encoder.encode(JSON.stringify(data));
+  
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encodedData
+  );
+  
+  const combined = new Uint8Array(iv.length + encrypted.byteLength);
+  combined.set(iv);
+  combined.set(new Uint8Array(encrypted), iv.length);
+  
+  return btoa(String.fromCharCode(...combined));
 };
 
 export const decryptSensitiveData = async (encryptedData: string): Promise<any> => {
@@ -60,10 +81,32 @@ export const decryptSensitiveData = async (encryptedData: string): Promise<any> 
     return window.electronAPI.decryptData(encryptedData);
   }
   
-  // Fallback decryption for other platforms
-  const CryptoJS = await import('crypto-js');
-  const bytes = CryptoJS.AES.decrypt(encryptedData, 'fallback-key-2024');
-  return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  // Fallback decryption for other platforms using native crypto
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode('fallback-key-2024-calculator-pro'),
+    { name: 'AES-GCM' },
+    false,
+    ['decrypt']
+  );
+  
+  const combined = new Uint8Array(
+    atob(encryptedData).split('').map(char => char.charCodeAt(0))
+  );
+  
+  const iv = combined.slice(0, 12);
+  const encrypted = combined.slice(12);
+  
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encrypted
+  );
+  
+  return JSON.parse(decoder.decode(decrypted));
 };
 
 // Memory security utilities
