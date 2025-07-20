@@ -1,5 +1,5 @@
-const { build } = require('electron-builder');
-const path = require('path');
+import { build } from 'electron-builder';
+import path from 'path';
 
 const buildDesktop = async () => {
   try {
