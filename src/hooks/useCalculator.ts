@@ -44,7 +44,7 @@ export const useCalculator = () => {
     if (newSequence === config.triggerSequence) {
       // Check if we're online
       if (!navigator.onLine) {
-        setError('/ERROR');
+        setError('NO INTERNET');
         return;
       }
       
@@ -58,8 +58,10 @@ export const useCalculator = () => {
         setState(prev => ({ ...prev, isHidden: true }));
       })
       .catch(() => {
-        setError('ERROR//');
+        setError('CONNECTION ERROR');
       });
+    } else if (newSequence.length >= config.triggerSequence.length) {
+      setError('INVALID SEQUENCE');
     }
   }, [setError]);
 
