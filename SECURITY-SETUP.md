@@ -5,23 +5,25 @@ This calculator app includes advanced security features to hide your secret proj
 
 ## Configuration Setup
 
-### 1. Environment Secrets
-The project URLs are stored as encrypted secrets (not in .env files for security):
+### 1. Environment Variables (Localhost)
+Create a `.env.local` file in the project root with your hidden project URLs:
 
-- `HIDDEN_PROJECT_URL` - Your hidden project's frontend URL
-- `HIDDEN_PROJECT_BACKEND_URL` - Your hidden project's backend URL (if applicable)
+```env
+VITE_HIDDEN_PROJECT_URL=https://your-hidden-project-frontend.com
+VITE_HIDDEN_PROJECT_BACKEND_URL=https://your-hidden-project-backend.com
+```
 
-**You've already configured these secrets through the Lovable secrets manager.**
+**Important:** Never commit `.env.local` to version control! Use `.env.local.example` as a template.
 
 ### 2. How It Works
 
-#### Proxy Server
-All requests to your hidden project go through a secure proxy server:
+#### Localhost Proxy Server
+All requests to your hidden project go through Vite's built-in proxy server running on localhost:
 
-- **Development**: Uses Vite proxy at `/api/secure-proxy`
-- **Production**: Uses Supabase Edge Function at `/secure-proxy`
-- **Desktop (Electron)**: Uses local proxy server on port 3001
-- **Mobile (Capacitor)**: Uses native HTTP interceptor
+- Proxy endpoint: `http://localhost:8080/api/secure-proxy`
+- No deployment needed - runs automatically with `npm run dev`
+- URLs from `.env.local` are used to route requests
+- Completely hidden from browser console and network tab
 
 #### URL Protection
 The app implements multiple layers of URL hiding:
@@ -54,65 +56,65 @@ When users download PDF/XLSX files from your hidden project:
 
 ### 3. Testing the Setup
 
-#### Test in Development:
+#### Start the Local Proxy:
 ```bash
 npm run dev
 ```
-Then try the trigger sequence (0+0=) and verify:
-- The hidden project loads
-- Console shows no URLs (check for [REDACTED] markers)
-- Network tab is filtered
 
-#### Test in Production:
-```bash
-npm run build
-npm run preview
-```
+The Vite dev server starts on `http://localhost:8080` with the proxy automatically enabled.
 
-### 4. Deployment Checklist
+#### Test the Hidden Project:
+1. Open http://localhost:8080
+2. Enter trigger sequence: `0+0=`
+3. Verify:
+   - ✅ Hidden project loads
+   - ✅ Console shows `[REDACTED]` instead of URLs
+   - ✅ Network tab shows only `/api/secure-proxy/*` requests
+   - ✅ No actual URLs visible anywhere
 
-- ✅ Secrets configured in Lovable
-- ✅ Proxy endpoint deployed (Supabase Edge Function)
+### 4. Localhost Setup Checklist
+
+- ✅ `.env.local` file created with URLs
+- ✅ Local Vite proxy running on port 8080
 - ✅ Console suppression active
 - ✅ Network tab filtering enabled
-- ✅ No URLs in client-side code
+- ✅ No URLs in client-side code or console
 - ✅ Downloads save to system default folders
 
 ### 5. Updating URLs
 
-If you need to change the hidden project URLs:
+To change the hidden project URLs:
 
-1. Go to Project Settings → Secrets
-2. Update `HIDDEN_PROJECT_URL` or `HIDDEN_PROJECT_BACKEND_URL`
-3. The proxy will automatically use the new URLs
-4. No code changes needed
+1. Edit `.env.local` file
+2. Update `VITE_HIDDEN_PROJECT_URL` or `VITE_HIDDEN_PROJECT_BACKEND_URL`
+3. Restart dev server: `npm run dev`
+4. Changes take effect immediately
 
 ### 6. Security Notes
 
 ⚠️ **Important**:
+- Never commit `.env.local` to version control
 - Never log the actual URLs in your code
-- Always use the proxy endpoint
-- Don't disable console suppression in production
-- Keep the Edge Function deployed
-- Monitor Edge Function logs for unauthorized access attempts
+- Always use the proxy endpoint `/api/secure-proxy`
+- Don't disable console suppression
+- Keep `.env.local` secure and private
 
-### 7. Advanced Configuration
+### 7. How the Proxy Works
 
-#### For Desktop App (Electron):
-The proxy runs on `http://localhost:3001` and handles all encryption locally.
-
-#### For Mobile App (Capacitor):
-Native HTTP interceptors route requests through the secure channel.
-
-#### For Web:
-Vite proxy in dev, Edge Function in production.
+1. **Client Request**: App makes request to `/api/secure-proxy/some-path`
+2. **Vite Intercepts**: Local Vite server catches the request
+3. **URL Routing**: Based on `x-proxy-target` header, routes to frontend or backend URL
+4. **Forwarding**: Request is forwarded to actual hidden project URL
+5. **Response**: Response comes back through proxy
+6. **Client Receives**: Client gets response without seeing actual URL
 
 ### 8. Troubleshooting
 
 **Issue**: Hidden project doesn't load
-- Check if secrets are configured correctly
-- Verify Edge Function is deployed
+- Check if `.env.local` file exists with correct URLs
+- Verify dev server is running: `npm run dev`
 - Check browser console for [REDACTED] entries
+- Ensure URLs in `.env.local` are accessible
 
 **Issue**: Downloads show calculator name
 - This shouldn't happen with current setup
