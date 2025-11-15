@@ -76,10 +76,12 @@ export const initializeSecureProxy = () => {
 };
 
 const shouldUseProxy = (url: string): boolean => {
-  // Add logic to determine if URL should be proxied
-  // For now, we'll check against known patterns
-  return url.includes('devtunnels') || 
-         url.includes('your-hidden-project-domain');
+  // Proxy all external requests that aren't local assets
+  if (url.startsWith('/') || url.startsWith(window.location.origin)) {
+    return false;
+  }
+  // Proxy any absolute HTTP/HTTPS URLs (these would be to hidden project)
+  return url.startsWith('http://') || url.startsWith('https://');
 };
 
 const shouldFilterResource = (url: string): boolean => {
